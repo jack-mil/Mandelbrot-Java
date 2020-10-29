@@ -1,19 +1,15 @@
 package mandelbrotset;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
-import javafx.embed.swing.SwingFXUtils;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 public class MandelbrotPane extends Pane {
     // Define the window size
@@ -23,20 +19,46 @@ public class MandelbrotPane extends Pane {
     // Define maximum iterations to calculate for *each* point
     static final int ITERATIONS = 100;
 
-    private WritableImage image = new WritableImage(WIDTH, HEIGHT);
-    private ImageView imageView = new ImageView(this.image);
+    private final IntegerProperty iterations;
+    private final ObjectProperty<Color> inColor;
+    private final ObjectProperty<Color> outColor;
+
+    private WritableImage image;
+    private ImageView imageView;
+
     public MandelbrotPane() {
-        this.setWidth(WIDTH);
-        this.setHeight(HEIGHT);
+        this.image = new WritableImage(WIDTH, HEIGHT);
+        this.imageView = new ImageView(this.image);
+
+        this.iterations = new SimpleIntegerProperty(this, "Iteration Count", ITERATIONS);
+        this.inColor = new SimpleObjectProperty<>(this, "inColor", Color.WHITE);
+        this.outColor = new SimpleObjectProperty<>(this, "outColor", Color.BLACK);
+
         getChildren().add(this.imageView);
     }
 
+    public IntegerProperty iterationsProperty() {
+        return this.iterations;
+    }
+
+    public ObjectProperty<Color> inColorProperty() {
+        return this.inColor;
+    }
+
+    public final ObjectProperty<Color> outColorProperty() {
+        return this.outColor;
+    }
+
+    public Image getImage() {
+        return this.image;
+    }
+
     /**
-     * The MandelbrotSet Object generates its pixelBuffer when it is run. 
-     * Basic algorithm from:
+     * The MandelbrotSet Object generates its pixelBuffer when it is run. Basic
+     * algorithm from:
      * https://en.wikipedia.org/wiki/Mandelbrot_set#Computer_drawings
      */
-    public void render(Color inColor, Color outColor) {
+    public void render() {
         PixelWriter pixels = this.image.getPixelWriter();
 
         for (int Py = 0; Py < HEIGHT; Py++) {
@@ -56,7 +78,7 @@ public class MandelbrotPane extends Pane {
 
                 // |z| must remain <= 2 in every iteration for point c to be
                 // in the mandelbrot set
-                while (x * x + y * y <= 2 * 2 && n < ITERATIONS) {
+                while (x * x + y * y <= 2 * 2 && n < this.iterations.intValue()) {
                     // Calculate Re(z^2 + c0)
                     double xtemp = x * x - y * y + x0;
                     // Calculate Im(z^2 + c0)
@@ -65,35 +87,10 @@ public class MandelbrotPane extends Pane {
                     n++;
                 }
                 // A pixel is WHITE if it is *not* part of the mandelbrot set
-                Color rgb = (n == ITERATIONS) ? inColor : outColor;
+                Color rgb = (n == this.iterations.intValue()) ? this.inColor.getValue() : this.outColor.getValue();
                 pixels.setColor(Px, Py, rgb);
             }
         }
     }
 
-    /**
-     * Open a file chooser and save the current image
-     * 
-     * @param stage
-     */
-    public void saveToFile(Stage stage) {
-
-        // Let the user select a location to store the image
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Save Image");
-        chooser.setInitialFileName("mandelbrot.png");
-        chooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Image file (*.png)", "*.png"));
-        File outFile = chooser.showSaveDialog(stage);
-
-        if (outFile != null) {
-            // Convert to an ImageBuffer we can write to a file
-            BufferedImage bImage = SwingFXUtils.fromFXImage(this.image, null);
-            try {
-                ImageIO.write(bImage, "png", outFile);
-                System.out.println("File saved to " + outFile.getAbsolutePath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

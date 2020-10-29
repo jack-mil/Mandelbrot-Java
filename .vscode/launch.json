@@ -9,7 +9,7 @@
             "name": "CodeLens (Launch) - MandelbrotSet",
             "request": "launch",
             "mainClass": "mandelbrotset.MandelbrotSet",
-            "projectName": "MandelbrotSet_5049219f",
+            "projectName": "MandelbrotSet_5fbf4b2c",
             "vmArgs": "--module-path %PATH_TO_FX% --add-modules javafx.controls"
         },
         {
