@@ -3,6 +3,8 @@ package mandelbrotset;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.imageio.ImageIO;
 
@@ -10,18 +12,11 @@ import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -29,11 +24,21 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
+// Jackson Miller
+// COSC2103 Computer Science 2
+// 2020-10-31
+// CS2 Art Project: Static Mandelbrot Fractal Render.
+// This program displays a procedurally generated Mandelbrot Fractal with
+// basic settings like iteration counts and coloring mode.
+
 public class MandelbrotSet extends Application {
 
     private MandelbrotPane fractalPane = new MandelbrotPane();
 
     private Stage primaryStage;
+
+    /** The main class only exists to run from within the IDE */
+    public static void main(String[] args) { launch(args); }
 
     /**
      * The start() method is run automatically by the Application superclass Here we
@@ -42,10 +47,43 @@ public class MandelbrotSet extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        // Stage settings
+        // Stage settings, with application icon
         primaryStage.setTitle("CS2: Mandelbrot Set");
         primaryStage.getIcons().add(new Image(MandelbrotSet.class.getResourceAsStream("icon.png")));
+        primaryStage.setResizable(false);
 
+        /* --- Options and controls (right) --- */
+        VBox options = getOptionsPanel();
+
+        /* --- Image area (left) --- */
+        // Add signature
+        Text name = new Text("Jackson Miller");
+        name.setFont(new Font(20));
+        name.setStroke(Color.BLACK);
+        name.setFill(Color.BLACK);
+
+        // Create StackPane to layer name and fractal image
+        StackPane.setAlignment(name, Pos.BOTTOM_RIGHT);
+        StackPane imageGroup = new StackPane(fractalPane, name);
+
+        // Add image and options to main Scene
+        HBox mainPane = new HBox();
+        mainPane.setPadding(new Insets(10));
+        mainPane.getChildren().addAll(imageGroup, options);
+
+        // Render the Fractal Image
+        fractalPane.render();
+
+        // Create the main scene and display the application window
+        primaryStage.setScene(new Scene(mainPane));
+        primaryStage.show();
+    }
+
+    /**
+     * Make the right hand controls and options
+     * @return VBox containing menu controls
+     */
+    private VBox getOptionsPanel() {
         /* --- Options area (right) --- */
         VBox options = new VBox();
         options.setAlignment(Pos.TOP_CENTER);
@@ -58,79 +96,92 @@ public class MandelbrotSet extends Application {
 
         Label infoLabel = new Label("Hover for tooltips");
 
+        // Add render button and label to top of Vbox
         options.getChildren().addAll(render, infoLabel);
 
-        // Create Color pickers and labels
-        ColorPicker color1 = new ColorPicker(Color.RED);
-        ColorPicker color2 = new ColorPicker(Color.BLUE);
-        // The chosen color is bound to Image properties, and triggers a render when
-        // selected
-        fractalPane.outColorProperty().bind(color1.valueProperty());
-        fractalPane.inColorProperty().bind(color2.valueProperty());
-        color1.setOnAction(e -> fractalPane.render());
-        color2.setOnAction(e -> fractalPane.render());
-
-        options.getChildren().addAll(color1, new Label("Color 1", color1), color2, new Label("Color 2", color2));
-
-        // Create a button to save the current image to a file
-        Button save = new Button("Save Image");
-        save.setOnAction(e -> saveImageToFile(fractalPane.getImage()));
-
-        // Create radio buttons to control coloring modes
-        ToggleGroup group = new ToggleGroup();
-
-        RadioButton range = new RadioButton("Range Color 1 -> 2");
-        range.setTooltip(new Tooltip("A gradient based on how close to the set a point is"));
-        range.setSelected(true);
-        range.setToggleGroup(group);
-
-        RadioButton psych = new RadioButton("Psychedelic Colors");
-        psych.setTooltip(new Tooltip(
-                "\"Random\" bands of color, change color 1 and the iteration count for completely new renders"
-                        + "\n Looks best when Color 1 is *not* RED"));
-        psych.setToggleGroup(group);
-        // Set sensible default for this color mode
-        psych.setOnAction(e -> {
-            color1.setValue(Color.web("99b3ff"));
-            color2.setValue(Color.WHITE);
-        });
-        // Bind this radio button to toggle the color mode in MandelbrotPane Object
-        fractalPane.psychedelicProperty().bind(psych.selectedProperty());
-
+        // Add Color controls to Vbox
+        options.getChildren().addAll(getColorControls());
+        
         // Create a spinner to configure the maximum iterations
         Spinner<Integer> iterSpinner = new Spinner<>(1, 1000, 30);
         Label iterLabel = new Label("Iteration Count", iterSpinner);
         iterSpinner.setEditable(true);
         fractalPane.iterationsProperty().bind(iterSpinner.valueProperty());
+        options.getChildren().addAll(iterSpinner, iterLabel);
 
-        options.getChildren().addAll(range, psych, iterSpinner, iterLabel, save);
+        // Create a button to save the current image to a file
+        // Save method defined below
+        Button save = new Button("Save Image");
+        save.setOnAction(e -> saveImageToFile(fractalPane.getImage()));
+        options.getChildren().add(save);
 
-        /* --- Image area (left) --- */
-        // Add signature
-        Text name = new Text("Jackson Miller");
-        name.setFont(new Font(20));
-        name.setStroke(Color.BLACK);
-        name.setFill(Color.BLACK);
+        return options;
+    }
 
-        // Create Stackpane to layer name and fractal image
-        StackPane.setAlignment(name, Pos.BOTTOM_RIGHT);
-        StackPane imageGroup = new StackPane(fractalPane, name);
+    /**
+     * Generates the controls related to color selection and generation mode
+     * Options are bound to MandelbrotPane Properties
+     * @return List of nodes to add
+     */
+    private ArrayList<Node> getColorControls() {
 
-        // Add image and options to main Scene
-        HBox mainPane = new HBox();
-        mainPane.setPadding(new Insets(10));
-        mainPane.getChildren().addAll(imageGroup, options);
+        ArrayList<Node> nodes = new ArrayList<>();
 
-        primaryStage.setScene(new Scene(mainPane));
-        primaryStage.show();
-        // Render the Fractal Image
-        fractalPane.render();
+        // Create Color pickers and labels
+        ColorPicker color1 = new ColorPicker(Color.RED);
+        ColorPicker color2 = new ColorPicker(Color.BLUE);
+        // The chosen color is bound to Image properties, and renders when changed
+        fractalPane.outColorProperty().bind(color1.valueProperty());
+        fractalPane.inColorProperty().bind(color2.valueProperty());
+        color1.setOnAction(e -> fractalPane.render());
+        color2.setOnAction(e -> fractalPane.render());
+
+        // Add color pickers and labels to list of nodes
+        Collections.addAll(nodes,
+                    color1, new Label("Color 1", color1), 
+                    color2, new Label("Color 2", color2));
+
+        // Create radio buttons to control coloring modes
+        // Use a toggle group to restrict one mode at a time
+        ToggleGroup group = new ToggleGroup();
+
+        // The range mode maps points far from the set with color 1,
+        // and close to the set with color 2
+        RadioButton range = new RadioButton("Range Color 1 -> 2");
+        range.setTooltip(new Tooltip("A gradient based on how close to the set a point is"));
+        range.setSelected(true);
+        range.setToggleGroup(group);
+
+        // Reset default colors when switching modes
+        range.setOnAction(e -> {
+            color1.setValue(Color.RED);
+            color2.setValue(Color.BLUE);
+        });
+
+        // This color mode was discovered by accident, but it looks cool
+        // See MandelbrotPane class for implementations
+        RadioButton psych = new RadioButton("Psychedelic Colors");
+        psych.setTooltip(new Tooltip(
+                "\"Random\" bands of color, change color 1 and the iteration count for completely new renders"
+                        + "\n Looks best when Color 1 is *not* RED"));
+        psych.setToggleGroup(group);
+
+        // Set current colors to nice options when this mode is selected
+        psych.setOnAction(e -> {
+            color1.setValue(Color.web("99b3ff"));
+            color2.setValue(Color.WHITE);
+        });
+        // Bind this radio button to toggle the coloring mode in MandelbrotPane Object
+        fractalPane.psychedelicProperty().bind(psych.selectedProperty());
+        
+        // Add radio buttons to list of nodes, and return
+        Collections.addAll(nodes, range, psych);
+        return nodes;
     }
 
     /**
      * Open a file chooser and save the current image
-     * 
-     * @param stage
+     * @param image The Image to save
      */
     public void saveImageToFile(Image image) {
 
@@ -156,9 +207,6 @@ public class MandelbrotSet extends Application {
         }
     }
 
-    /** The main class only exists to run from within the IDE */
-    public static void main(String[] args) {
-        launch(args);
-    }
+
 
 }

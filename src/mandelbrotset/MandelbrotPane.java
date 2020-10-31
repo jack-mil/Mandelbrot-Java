@@ -16,35 +16,39 @@ import javafx.scene.paint.Color;
 public class MandelbrotPane extends Pane {
 
     // Define the image size
-    static final int WIDTH = 800;
-    static final int HEIGHT = 800;
-    // private int _width;
-    // private int _height;
+    private final int WIDTH = 800;
+    private final int HEIGHT = 800;
 
     private final IntegerProperty maxIterations;
     private final ObjectProperty<Color> inColor;
     private final ObjectProperty<Color> outColor;
     private final BooleanProperty psychedelic;
+    
+    private WritableImage image;
+    private ImageView imageView;
 
     private double _maxIter;
     private Color _color1;
     private Color _color2;
 
-    private WritableImage image;
-    private ImageView imageView;
-
     public MandelbrotPane() {
         
         this.image = new WritableImage(WIDTH, HEIGHT);
-        this.imageView = new ImageView(this.image);
 
-        this.maxIterations = new SimpleIntegerProperty(this, "Iteration Count", 100);
+        this.maxIterations = new SimpleIntegerProperty(this, "Iteration Count");
         this.psychedelic = new SimpleBooleanProperty(this, "Crazy colors", false);
         this.inColor = new SimpleObjectProperty<>(this, "inColor", Color.RED);
         this.outColor = new SimpleObjectProperty<>(this, "outColor", Color.BLUE);
 
-        getChildren().add(this.imageView);
+        getChildren().add(new ImageView(this.image));
     }
+
+    public Image getImage() { return this.image; }
+
+    public BooleanProperty psychedelicProperty() { return this.psychedelic; }
+    public IntegerProperty iterationsProperty() { return this.maxIterations; }
+    public ObjectProperty<Color> inColorProperty() { return this.inColor; }
+    public final ObjectProperty<Color> outColorProperty() { return this.outColor; }
 
     /**
      * The MandelbrotSet Object generates its pixelBuffer when it is run. Basic
@@ -54,13 +58,14 @@ public class MandelbrotPane extends Pane {
     public void render() {
         PixelWriter pixels = this.image.getPixelWriter();
 
+        // Get current settings from bound properties, once per render
+        // No need to poll every iteration.
         _maxIter = this.maxIterations.doubleValue();
         _color1 = this.outColor.getValue();
         _color2 = this.inColor.getValue();
 
         for (int Py = 0; Py < HEIGHT; Py++) {
             for (int Px = 0; Px < WIDTH; Px++) {
-
                 // Scale image coordinates to mandelbrot range
                 // All points are within a radius 2 circle on complex plane
                 // I chose points that made a nice centered, square image
@@ -92,7 +97,7 @@ public class MandelbrotPane extends Pane {
 
     /**
      * Set the hue of each pixel based on the number of iterations completed. The
-     * range is set by user input Two modes are given: Normal mode is a gradient
+     * range is set by user input. Two modes are given: Normal mode is a gradient
      * from c1 -> c2 Psychedelic produces random looking well defined bands of color
      * 
      * The pixel will be black if it is determined to be *in* the set
@@ -101,9 +106,11 @@ public class MandelbrotPane extends Pane {
      * @return
      */
     private Color pickColor(int N) {
+
         double hue;
         double value;
         double sat;
+        
         if (this.psychedelic.getValue()) {
             hue = _color1.getHue() * (_maxIter / N);
             value = (N < _maxIter) ? 1.0 : 0.0;
@@ -116,23 +123,5 @@ public class MandelbrotPane extends Pane {
         return Color.hsb(hue, sat, value);
     }
 
-    public BooleanProperty psychedelicProperty() {
-        return this.psychedelic;
-    }
 
-    public IntegerProperty iterationsProperty() {
-        return this.maxIterations;
-    }
-
-    public ObjectProperty<Color> inColorProperty() {
-        return this.inColor;
-    }
-
-    public final ObjectProperty<Color> outColorProperty() {
-        return this.outColor;
-    }
-
-    public Image getImage() {
-        return this.image;
-    }
 }
