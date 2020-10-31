@@ -31,9 +31,11 @@ import javafx.stage.Stage;
 // This program displays a procedurally generated Mandelbrot Fractal with
 // basic settings like iteration counts and coloring mode.
 
+/** Main Class */
 public class MandelbrotSet extends Application {
 
-    private MandelbrotPane fractalPane = new MandelbrotPane();
+    // The Fractal Image View to be displayed. Accessible to private Methods 
+    private MandelbrotImageView fractalIV = new MandelbrotImageView();
 
     private Stage primaryStage;
 
@@ -64,7 +66,7 @@ public class MandelbrotSet extends Application {
 
         // Create StackPane to layer name and fractal image
         StackPane.setAlignment(name, Pos.BOTTOM_RIGHT);
-        StackPane imageGroup = new StackPane(fractalPane, name);
+        StackPane imageGroup = new StackPane(fractalIV, name);
 
         // Add image and options to main Scene
         HBox mainPane = new HBox();
@@ -72,7 +74,7 @@ public class MandelbrotSet extends Application {
         mainPane.getChildren().addAll(imageGroup, options);
 
         // Render the Fractal Image
-        fractalPane.render();
+        fractalIV.render();
 
         // Create the main scene and display the application window
         primaryStage.setScene(new Scene(mainPane));
@@ -92,7 +94,7 @@ public class MandelbrotSet extends Application {
 
         // Bind button events to MandelbrotPane instance methods
         Button render = new Button("(Re)render");
-        render.setOnAction(e -> fractalPane.render());
+        render.setOnAction(e -> fractalIV.render());
 
         Label infoLabel = new Label("Hover for tooltips");
 
@@ -106,13 +108,13 @@ public class MandelbrotSet extends Application {
         Spinner<Integer> iterSpinner = new Spinner<>(1, 1000, 30);
         Label iterLabel = new Label("Iteration Count", iterSpinner);
         iterSpinner.setEditable(true);
-        fractalPane.iterationsProperty().bind(iterSpinner.valueProperty());
+        fractalIV.iterationsProperty().bind(iterSpinner.valueProperty());
         options.getChildren().addAll(iterSpinner, iterLabel);
 
         // Create a button to save the current image to a file
         // Save method defined below
         Button save = new Button("Save Image");
-        save.setOnAction(e -> saveImageToFile(fractalPane.getImage()));
+        save.setOnAction(e -> saveImageToFile(fractalIV.getImage()));
         options.getChildren().add(save);
 
         return options;
@@ -131,10 +133,10 @@ public class MandelbrotSet extends Application {
         ColorPicker color1 = new ColorPicker(Color.RED);
         ColorPicker color2 = new ColorPicker(Color.BLUE);
         // The chosen color is bound to Image properties, and renders when changed
-        fractalPane.outColorProperty().bind(color1.valueProperty());
-        fractalPane.inColorProperty().bind(color2.valueProperty());
-        color1.setOnAction(e -> fractalPane.render());
-        color2.setOnAction(e -> fractalPane.render());
+        fractalIV.outColorProperty().bind(color1.valueProperty());
+        fractalIV.inColorProperty().bind(color2.valueProperty());
+        color1.setOnAction(e -> fractalIV.render());
+        color2.setOnAction(e -> fractalIV.render());
 
         // Add color pickers and labels to list of nodes
         Collections.addAll(nodes,
@@ -172,7 +174,7 @@ public class MandelbrotSet extends Application {
             color2.setValue(Color.WHITE);
         });
         // Bind this radio button to toggle the coloring mode in MandelbrotPane Object
-        fractalPane.psychedelicProperty().bind(psych.selectedProperty());
+        fractalIV.psychedelicProperty().bind(psych.selectedProperty());
         
         // Add radio buttons to list of nodes, and return
         Collections.addAll(nodes, range, psych);

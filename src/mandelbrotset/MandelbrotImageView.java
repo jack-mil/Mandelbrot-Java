@@ -6,14 +6,21 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
-public class MandelbrotPane extends Pane {
+/**
+ * Represents a Mandelbrot fractal Image. 
+ * 
+ * Method render() generates internal Image object property using settings 
+ * defined by public Property value.
+ * 
+ * Only generates 800 x 800 px images at this point, resizable images are saved
+ * for future.
+ */
+public class MandelbrotImageView extends ImageView {
 
     // Define the image size
     private final int WIDTH = 800;
@@ -24,39 +31,35 @@ public class MandelbrotPane extends Pane {
     private final ObjectProperty<Color> outColor;
     private final BooleanProperty psychedelic;
     
-    private WritableImage image;
-    private ImageView imageView;
-
     private double _maxIter;
     private Color _color1;
     private Color _color2;
 
-    public MandelbrotPane() {
+    /** Creates a new 800x800 px ImageView Node with internal fractal image. */
+    public MandelbrotImageView() {
         
-        this.image = new WritableImage(WIDTH, HEIGHT);
+        this.setImage(new WritableImage(WIDTH, HEIGHT));
 
         this.maxIterations = new SimpleIntegerProperty(this, "Iteration Count");
         this.psychedelic = new SimpleBooleanProperty(this, "Crazy colors", false);
         this.inColor = new SimpleObjectProperty<>(this, "inColor", Color.RED);
         this.outColor = new SimpleObjectProperty<>(this, "outColor", Color.BLUE);
 
-        getChildren().add(new ImageView(this.image));
     }
 
-    public Image getImage() { return this.image; }
-
-    public BooleanProperty psychedelicProperty() { return this.psychedelic; }
+    // Fractal Image Properties
     public IntegerProperty iterationsProperty() { return this.maxIterations; }
     public ObjectProperty<Color> inColorProperty() { return this.inColor; }
     public final ObjectProperty<Color> outColorProperty() { return this.outColor; }
+    public BooleanProperty psychedelicProperty() { return this.psychedelic; }
 
     /**
      * The MandelbrotSet Object generates its pixelBuffer when it is run. Basic
-     * algorithm from:
-     * https://en.wikipedia.org/wiki/Mandelbrot_set#Computer_drawings
+     * algorithm from: https://en.wikipedia.org/wiki/Mandelbrot_set#Computer_drawings
      */
     public void render() {
-        PixelWriter pixels = this.image.getPixelWriter();
+        // Use PixelWriter to edit this ImageView's internal Image pixels
+        PixelWriter pixels = ((WritableImage) this.getImage()).getPixelWriter();
 
         // Get current settings from bound properties, once per render
         // No need to poll every iteration.
