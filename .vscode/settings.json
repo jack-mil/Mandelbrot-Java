@@ -1,9 +1,0 @@
-{
-    "java.project.referencedLibraries": [
-        "lib/**/*.jar",
-        "c:\\Users\\jackmil\\scoop\\apps\\gluon-openjfx-sdk\\current\\lib\\**",
-    ],
-    "cSpell.words": [
-        "xtemp"
-    ]
-}
