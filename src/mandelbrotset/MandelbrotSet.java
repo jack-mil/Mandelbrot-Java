@@ -140,8 +140,8 @@ public class MandelbrotSet extends Application {
 
         // Add color pickers and labels to list of nodes
         Collections.addAll(nodes,
-                    color1, new Label("Color 1", color1), 
-                    color2, new Label("Color 2", color2));
+                    new Label("Color 1", color1), 
+                    new Label("Color 2", color2));
 
         // Create radio buttons to control coloring modes
         // Use a toggle group to restrict one mode at a time
