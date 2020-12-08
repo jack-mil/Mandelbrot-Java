@@ -1,12 +1,5 @@
 package mandelbrotset;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
@@ -20,38 +13,11 @@ import javafx.scene.paint.Color;
  * Only generates 800 x 800 px images at this point, resizable images are saved
  * for future.
  */
-public class MandelbrotImageView extends ImageView {
-
-    // Define the image size
-    private final int WIDTH = 800;
-    private final int HEIGHT = 800;
-
-    private final IntegerProperty maxIterations;
-    private final ObjectProperty<Color> inColor;
-    private final ObjectProperty<Color> outColor;
-    private final BooleanProperty psychedelic;
+public class MandelbrotImageView extends FractalImageView {
     
     private double _maxIter;
     private Color _color1;
     private Color _color2;
-
-    /** Creates a new 800x800 px ImageView Node with internal fractal image. */
-    public MandelbrotImageView() {
-        
-        this.setImage(new WritableImage(WIDTH, HEIGHT));
-
-        this.maxIterations = new SimpleIntegerProperty(this, "Iteration Count");
-        this.psychedelic = new SimpleBooleanProperty(this, "Crazy colors", false);
-        this.inColor = new SimpleObjectProperty<>(this, "inColor", Color.RED);
-        this.outColor = new SimpleObjectProperty<>(this, "outColor", Color.BLUE);
-
-    }
-
-    // Fractal Image Properties
-    public IntegerProperty iterationsProperty() { return this.maxIterations; }
-    public ObjectProperty<Color> inColorProperty() { return this.inColor; }
-    public final ObjectProperty<Color> outColorProperty() { return this.outColor; }
-    public BooleanProperty psychedelicProperty() { return this.psychedelic; }
 
     /**
      * The MandelbrotSet Object generates its pixelBuffer when it is run. Basic
@@ -108,7 +74,7 @@ public class MandelbrotImageView extends ImageView {
      * @param N The iteration count to calculate color for
      * @return
      */
-    private Color pickColor(int N) {
+    protected Color pickColor(int N) {
 
         double hue;
         double value;
