@@ -28,7 +28,7 @@ public class FractalViewer extends Application {
   @Override
   public void init() {
     // The Fractal Image View to be displayed.
-    fractalIV = new MandelbrotImageView();
+    fractalIV = new JuliaImageView();
   }
 
   /** The main class only exists to run from within the IDE */
@@ -44,24 +44,24 @@ public class FractalViewer extends Application {
   public void start(Stage stage) {
     // Stage settings, with application icon
     stage.setTitle("Fractal Viewer");
-    stage.getIcons().add(new Image(FractalViewer.class.getResourceAsStream("icon.png")));
+    stage.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
 
     /* --- Options and controls (right) --- */
     OptionsPane options = new OptionsPane();
 
     // Bind color options to fractal view from options
-    fractalIV.outColorProperty().bind(options.color1Property);
-    fractalIV.inColorProperty().bind(options.color2Property);
+    fractalIV.outColorProperty().bind(options.color1ValueProperty());
+    fractalIV.inColorProperty().bind(options.color2ValueProperty());
 
     // Bind iteration count property from options
-    fractalIV.iterationsProperty().bind(options.iterationsProperty);
+    fractalIV.iterationsProperty().bind(options.iterationValueProperty());
 
     // Bind radio toggle button for color modes
-    fractalIV.psychedelicProperty().bind(options.psychModeProperty);
+    fractalIV.psychedelicProperty().bind(options.psychSelectedProperty());
 
     // Bind button events to MandelbrotPane instance methods
-    options.render.setOnAction(e -> fractalIV.render());
-    options.save.setOnAction(e -> fractalIV.saveImageToFile());
+    options.setRenderAction(e -> fractalIV.render());
+    options.setSaveAction(e -> fractalIV.saveImageToFile());
 
     /* --- Image area (left) --- */
     ScrollPane scroll = createScrollPane(fractalIV);
@@ -85,8 +85,6 @@ public class FractalViewer extends Application {
 
     // show the scene.
     Scene scene = new Scene(mainPane);
-    stage.setWidth(800);
-    stage.setHeight(800);
     stage.setScene(scene);
     stage.show();
 
@@ -104,6 +102,8 @@ public class FractalViewer extends Application {
     ScrollPane scroll = new ScrollPane();
     scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
     scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    scroll.setPrefViewportWidth(800);
+    scroll.setPrefViewportHeight(800);
     scroll.setPannable(true);
     scroll.setContent(node);
     return scroll;
