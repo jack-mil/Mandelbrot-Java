@@ -6,6 +6,22 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - PlutoExplorer",
+            "request": "launch",
+            "mainClass": "PlutoExplorer",
+            "projectName": "MandelbrotSet_5fbf4b2c",
+            "vmArgs": "--module-path %PATH_TO_FX% --add-modules javafx.controls"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - PannableView",
+            "request": "launch",
+            "mainClass": "PannableView",
+            "projectName": "MandelbrotSet_5fbf4b2c",
+            "vmArgs": "--module-path %PATH_TO_FX% --add-modules javafx.controls"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - MandelbrotSet",
             "request": "launch",
             "mainClass": "mandelbrotset.MandelbrotSet",

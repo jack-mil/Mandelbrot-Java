@@ -16,4 +16,4 @@ nb-configuration.xml
 *.ear
 *.zip
 
-#
+test/*
