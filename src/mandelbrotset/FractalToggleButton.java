@@ -8,19 +8,19 @@ import javafx.scene.control.Tooltip;
  */
 public class FractalToggleButton extends ToggleButton {
 
-    public FractalToggleButton(String arg0) {
-        super(arg0);
-        this.setTooltip(new Tooltip("Switch between Julia or Mandelbrot Set"));
-    }
+  public FractalToggleButton(String arg0) {
+    super(arg0);
+    this.setTooltip(new Tooltip("Switch between Julia or Mandelbrot Set"));
+  }
 
-    @Override
-    public void fire() {
-        if(this.isSelected()) {
-            this.setText("Julia Set");
-        } else {
-            this.setText("Mandelbrot Set");
-        }
-        super.fire();
+  @Override
+  public void fire() {
+    if(this.isSelected()) {
+      this.setText("Julia Set");
+    } else {
+      this.setText("Mandelbrot Set");
     }
+    super.fire();
+  }
 
 }
