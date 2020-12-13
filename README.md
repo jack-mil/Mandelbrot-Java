@@ -1,5 +1,6 @@
 # Mandelbrot & Julia Fractal Viewer #
-## CS2 JAVAFX project ##
+
+## [CS2 JAVAFX project](https://github.com/jack-mil/Mandelbrot-Java) ##
 
 A fractal exploration program written in Java.
 
