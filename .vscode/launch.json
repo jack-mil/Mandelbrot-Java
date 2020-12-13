@@ -6,34 +6,17 @@
     "configurations": [
         {
             "type": "java",
-            "name": "CodeLens (Launch) - PlutoExplorer",
+            "name": "Launch Main Application",
             "request": "launch",
-            "mainClass": "PlutoExplorer",
-            "projectName": "MandelbrotSet_5fbf4b2c",
-            "vmArgs": "--module-path %PATH_TO_FX% --add-modules javafx.controls"
-        },
-        {
-            "type": "java",
-            "name": "CodeLens (Launch) - PannableView",
-            "request": "launch",
-            "mainClass": "PannableView",
-            "projectName": "MandelbrotSet_5fbf4b2c",
-            "vmArgs": "--module-path %PATH_TO_FX% --add-modules javafx.controls"
-        },
-        {
-            "type": "java",
-            "name": "CodeLens (Launch) - MandelbrotSet",
-            "request": "launch",
-            "mainClass": "mandelbrotset.MandelbrotSet",
-            "projectName": "MandelbrotSet_5fbf4b2c",
-            "vmArgs": "--module-path %PATH_TO_FX% --add-modules javafx.controls"
+            "mainClass": "mandelbrotset.MainViewer",
+            "vmArgs": "--enable-preview --module-path %PATH_TO_FX% --add-modules javafx.controls"
         },
         {
             "type": "java",
             "name": "Debug (Launch) - Current File",
             "request": "launch",
             "mainClass": "${file}",
-            "vmArgs": "--module-path %PATH_TO_FX% --add-modules javafx.controls"
+            "vmArgs": "--enable-preview --module-path %PATH_TO_FX% --add-modules javafx.controls"
         }
     ]
 }
